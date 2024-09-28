@@ -1,0 +1,9 @@
+spring:
+    application:
+        name: generateUnitTestForMock
+server:
+  port: 80
+repository:
+    path: execution(public * xxyy.unittest.generateunittestformock.service..*.*(..)))
+service:
+    path: servicePath
