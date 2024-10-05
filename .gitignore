@@ -1,0 +1,10 @@
+/target/classes/application.yml
+/target/classes/xxyy/unittest/generateunittestformock/config/ApplicationContextConig.class
+/target/classes/xxyy/unittest/generateunittestformock/config/AspectPointJoinConig.class
+/target/classes/xxyy/unittest/generateunittestformock/GenerateUnitTestForMockApplication.class
+/target/classes/xxyy/unittest/generateunittestformock/aspect/Repositoryaspect.class
+/target/classes/xxyy/unittest/generateunittestformock/aspect/ServiceAspect.class
+/target/classes/xxyy/unittest/generateunittestformock/controller/TestAspectController.class
+/target/classes/xxyy/unittest/generateunittestformock/service/TestAspectService.class
+/target/classes/xxyy/unittest/generateunittestformock/service/impl/TestAspectServiceImpl.class
+/target/classes/xxyy/unittest/generateunittestformock/dto/UserInfoDto.class

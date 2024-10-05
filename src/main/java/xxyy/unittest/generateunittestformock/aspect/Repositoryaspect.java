@@ -1,6 +1,7 @@
 package xxyy.unittest.generateunittestformock.aspect;
 
 import com.alibaba.fastjson2.JSON;
+import jakarta.annotation.PostConstruct;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -10,17 +11,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import xxyy.unittest.generateunittestformock.config.AspectPointJoinConig;
 
 @Aspect
 @Component
 public class Repositoryaspect {
 
-    @Value("${repository.path}")
+    private Class aClass;
+
+    @PostConstruct
+    void init(){
+
+    }
+
+    @Value("${generate.repository.path}")
     private String repositoryPath;
 
     Logger logger = LoggerFactory.getLogger(Repositoryaspect.class);
 
-    @Pointcut(value = "execution(public * xxyy.unittest.generateunittestformock.service..*.*(..)))")
+
+    @Pointcut(value = AspectPointJoinConig.POINT_CUT_METHOD)
     public void dealAfterReturning(){
 
     }
@@ -51,6 +61,17 @@ public class Repositoryaspect {
         // 打印返回值类型和 JSON
         System.out.println("返回值类型: " + returnType.getName() + ", 返回值 JSON: " + returnJson);
 
+
+        // 调用栈
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+
+        // 打印调用栈信息
+        for (StackTraceElement element : stackTrace) {
+            System.out.println("类名: " + element.getClassName() +
+                    ", 方法名: " + element.getMethodName() +
+                    ", 文件名: " + element.getFileName() +
+                    ", 行号: " + element.getLineNumber());
+        }
 
         logger.info("AfterReturning:结束");
     }
