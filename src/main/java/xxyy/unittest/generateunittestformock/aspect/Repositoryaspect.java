@@ -12,9 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import xxyy.unittest.generateunittestformock.config.AspectPointJoinConig;
 import xxyy.unittest.generateunittestformock.dto.MethodDescript;
+import xxyy.unittest.generateunittestformock.dto.ParamDescript;
 import xxyy.unittest.generateunittestformock.service.TestAspectService;
 
 import java.util.List;
@@ -33,7 +35,8 @@ public class Repositoryaspect {
     private String doReturnM = ", ";
     private String when = ")).when(";
     private String whenEnd = ").";
-    private String end = "();";
+    private String end = "(";
+    private String endEnd = ");";
 
     @PostConstruct
     void init() {
@@ -63,24 +66,36 @@ public class Repositoryaspect {
         this.getServiceName(joinPoint, methodDescript);
 
         // 方法和参数信息
-        this.getNethodNameAndArgs(joinPoint, methodDescript);
+        this.getMethodNameAndArgs(joinPoint, methodDescript);
 
         // 获取返回值类型并转换为 JSON
         this.getReturn(joinPoint, returnVlu, methodDescript);
 
         StringBuilder result = new StringBuilder();
         result.append(doReturn);
-        result.append(methodDescript.getReturnJson());
+        result.append(methodDescript.getRetrun().getJson());
         result.append(doReturnM);
-        result.append(methodDescript.getReturnType());
+        result.append(methodDescript.getRetrun().getType());
         result.append(when);
         result.append(methodDescript.getServiceName());
         result.append(whenEnd);
         result.append(methodDescript.getMethodName());
         result.append(end);
+        if(!CollectionUtils.isEmpty(methodDescript.getArgs())) {
+            StringBuilder allArgsJson = new StringBuilder();
+            for(ParamDescript paramDescript : methodDescript.getArgs()){
+                allArgsJson.append(paramDescript.getJson());
+                allArgsJson.append(",");
+                allArgsJson.append(paramDescript.getType());
+                allArgsJson.append(")");
+                allArgsJson.append(",");
+            }
+            result.append(allArgsJson.substring(0,allArgsJson.length()-1));
+        }
+        result.append(endEnd);
 
 //        logger.info(result.toString());
-        System.out.print(result.toString());
+        System.out.println(result.toString());
 //        stackTrace();
 
 //        logger.info("AfterReturning:结束");
@@ -91,7 +106,7 @@ public class Repositoryaspect {
      * @param joinPoint
      * @param methodDescript
      */
-    private void getNethodNameAndArgs(JoinPoint joinPoint, MethodDescript methodDescript) {
+    private void getMethodNameAndArgs(JoinPoint joinPoint, MethodDescript methodDescript) {
         MethodSignature methodSignature = ((MethodSignature) joinPoint.getSignature());
         String methodName = methodSignature.getMethod().getName();
         methodDescript.setMethodName(methodName);
@@ -102,9 +117,9 @@ public class Repositoryaspect {
 
         // 打印每个参数的类型和 JSON
         for (int i = 0; i < args.length; i++) {
-            String argJson = JSON.toJSONString(args[i]); // 转换成 JSON
-            argJson = escapeJson(argJson); // 转义特殊字符
-            System.out.print("参数类型: " + parameterTypes[i].getName() + ", 参数 JSON: " + argJson + " | ");
+            ParamDescript paramDescript = methodDescript.getRetrun();
+            this.dealParamToJson(joinPoint, args[i], paramDescript);
+            methodDescript.getArgs().add(paramDescript);
         }
     }
 
@@ -153,38 +168,65 @@ public class Repositoryaspect {
      * @return
      */
     private void getReturn(JoinPoint joinPoint, Object returnVlu, MethodDescript methodDescript) {
-        String returnJsonRaw = JSON.toJSONString(returnVlu); // 转换成 JSON
-        String returnJson = escapeJson(returnJsonRaw); // 转义特殊字符
 
-        String returnTypeName = null;
+        ParamDescript paramDescript = methodDescript.getRetrun();
+
+        this.dealParamToJson(joinPoint, returnVlu, paramDescript);
+    }
+
+    /**
+     *  将参数处理为JSON
+     * @param joinPoint
+     * @param paramValue
+     * @param paramDescript
+     */
+    private void dealParamToJson(JoinPoint joinPoint, Object paramValue, ParamDescript paramDescript) {
+        String paramJsonRaw = JSON.toJSONString(paramValue); // 转换成 JSON
+        String paramJson = escapeJson(paramJsonRaw); // 转义特殊字符
+
+        String paramTypeName = null;
 
         String jsonParseMethod = "JSON.parseObject(";
-        if (returnVlu != null) {
-            if (returnVlu instanceof List<?>) {
+        if (paramValue != null) {
+            if (paramValue instanceof List<?>) {
                 jsonParseMethod = "JSON.parseArray(";
-                if (((List<?>) returnVlu).iterator().hasNext()) {
-                    Object tmp = ((List<?>) returnVlu).iterator().next();
-                    returnTypeName = getReturnTypeName(tmp);
+                if (((List<?>) paramValue).iterator().hasNext()) {
+                    Object tmp = ((List<?>) paramValue).iterator().next();
+                    paramTypeName = getReturnTypeName(tmp);
                 }
-            } else if (returnVlu instanceof Set<?>) {
-                if (((Set<?>) returnVlu).iterator().hasNext()) {
-                    Object tmp = ((Set<?>) returnVlu).iterator().next();
-                    returnTypeName = "new TypeReference<Set<" + tmp.getClass().getName() + ">>(){}";
+            } else if (paramValue instanceof Set<?>) {
+                if (((Set<?>) paramValue).iterator().hasNext()) {
+                    Object tmp = ((Set<?>) paramValue).iterator().next();
+                    paramTypeName = "new TypeReference<Set<" + tmp.getClass().getName() + ">>(){}";
                 }
-            } else if (returnVlu instanceof Map<?, ?>) {
-                if (((Map<?, ?>) returnVlu).entrySet().iterator().hasNext()) {
-                    Map.Entry<?, ?> tmp = (Map.Entry<?, ?>) ((Map<?, ?>) returnVlu).entrySet().iterator().next();
-                    returnTypeName = "new TypeReference<Map<" + tmp.getKey().getClass().getName() + ", " + tmp.getValue().getClass().getName() + ">>(){}";
+            } else if (paramValue instanceof Map<?, ?>) {
+                if (((Map<?, ?>) paramValue).entrySet().iterator().hasNext()) {
+                    Map.Entry<?, ?> tmp = (Map.Entry<?, ?>) ((Map<?, ?>) paramValue).entrySet().iterator().next();
+                    paramTypeName = "new TypeReference<Map<" + tmp.getKey().getClass().getName() + ", " + tmp.getValue().getClass().getName() + ">>(){}";
                 }
 
             } else {
-                returnTypeName = getReturnTypeName(returnVlu);
+                paramTypeName = getReturnTypeName(paramValue);
             }
 
+        } else {
+            MethodSignature methodSignature = ((MethodSignature) joinPoint.getSignature());
+            Class paramTypeClass = methodSignature.getMethod().getReturnType();
+            paramTypeName = getReturnTypeNameByType(paramTypeClass.getName());
         }
 
-        methodDescript.setReturnJson(jsonParseMethod + "\"" + returnJson + "\"");
-        methodDescript.setReturnType(returnTypeName);
+        paramDescript.setJson(jsonParseMethod + "\"" + paramJson + "\"");
+        paramDescript.setType(paramTypeName);
+    }
+
+    /**
+     * 获取类名称
+     *
+     * @param typeName
+     * @return
+     */
+    private static String getReturnTypeNameByType(String typeName) {
+        return typeName + ".class";
     }
 
     /**

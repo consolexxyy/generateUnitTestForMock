@@ -1,33 +1,19 @@
 package xxyy.unittest.generateunittestformock.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MethodDescript {
-
-
-    private String returnJson;
-
-    private String returnType;
 
     private String serviceName;
 
     private String methodName;
 
+    private List<ParamDescript> args;
+
+    private ParamDescript retrun;
+
     private String paramJson;
-
-    public String getReturnJson() {
-        return returnJson;
-    }
-
-    public void setReturnJson(String returnJson) {
-        this.returnJson = returnJson;
-    }
-
-    public String getReturnType() {
-        return returnType;
-    }
-
-    public void setReturnType(String returnType) {
-        this.returnType = returnType;
-    }
 
     public String getServiceName() {
         return serviceName;
@@ -53,5 +39,24 @@ public class MethodDescript {
         this.paramJson = paramJson;
     }
 
+    public List<ParamDescript> getArgs() {
+        return args;
+    }
 
+    public void setArgs(List<ParamDescript> args) {
+        this.args = args;
+    }
+
+    public ParamDescript getRetrun() {
+        return retrun;
+    }
+
+    public void setRetrun(ParamDescript retrun) {
+        this.retrun = retrun;
+    }
+
+    public MethodDescript() {
+        this.retrun = new ParamDescript();
+        this.args = new ArrayList<ParamDescript>();
+    }
 }
