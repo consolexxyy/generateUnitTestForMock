@@ -62,16 +62,16 @@ public class Repositoryaspect {
         System.out.println("返回值类型: " + returnType.getName() + ", 返回值 JSON: " + returnJson);
 
 
-        // 调用栈
-        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-
-        // 打印调用栈信息
-        for (StackTraceElement element : stackTrace) {
-            System.out.println("类名: " + element.getClassName() +
-                    ", 方法名: " + element.getMethodName() +
-                    ", 文件名: " + element.getFileName() +
-                    ", 行号: " + element.getLineNumber());
-        }
+//        // 调用栈
+//        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+//
+//        // 打印调用栈信息
+//        for (StackTraceElement element : stackTrace) {
+//            System.out.println("类名: " + element.getClassName() +
+//                    ", 方法名: " + element.getMethodName() +
+//                    ", 文件名: " + element.getFileName() +
+//                    ", 行号: " + element.getLineNumber());
+//        }
 
         logger.info("AfterReturning:结束");
     }
