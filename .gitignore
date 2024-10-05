@@ -8,3 +8,7 @@
 /target/classes/xxyy/unittest/generateunittestformock/service/TestAspectService.class
 /target/classes/xxyy/unittest/generateunittestformock/service/impl/TestAspectServiceImpl.class
 /target/classes/xxyy/unittest/generateunittestformock/dto/UserInfoDto.class
+/target/test-classes/xxyy/unittest/generateunittestformock/GenerateUnitTestForMockApplicationTests$2.class
+/target/test-classes/xxyy/unittest/generateunittestformock/GenerateUnitTestForMockApplicationTests$1.class
+/target/test-classes/xxyy/unittest/generateunittestformock/GenerateUnitTestForMockApplicationTests.class
+/target/classes/xxyy/unittest/generateunittestformock/dto/MethodDescript.class
