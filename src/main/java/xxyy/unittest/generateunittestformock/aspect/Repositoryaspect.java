@@ -10,14 +10,14 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import xxyy.unittest.generateunittestformock.config.AspectPointJoinConig;
+import xxyy.unittest.generateunittestformock.annotation.MockTestMark;
+import xxyy.unittest.generateunittestformock.config.GenerateUnitTestForMockConfig;
 import xxyy.unittest.generateunittestformock.dto.MethodDescript;
 import xxyy.unittest.generateunittestformock.dto.ParamDescript;
-import xxyy.unittest.generateunittestformock.service.TestAspectService;
 
 import java.util.List;
 import java.util.Map;
@@ -27,9 +27,12 @@ import java.util.Set;
 @Component
 public class Repositoryaspect {
 
+    Logger logger = LoggerFactory.getLogger(Repositoryaspect.class);
 
-    @Resource
-    private TestAspectService testAspectService;
+    @Autowired
+    private GenerateUnitTestForMockConfig generateUnitTestForMockConfig;
+
+//    private static final String POINT_CUT_METHOD = AspectPointJoinConig.POINT_CUT_METHOD;
 
     private String doReturn = "doReturn(";
     private String doReturnM = ", ";
@@ -38,25 +41,54 @@ public class Repositoryaspect {
     private String end = "(";
     private String endEnd = ");";
 
-    @PostConstruct
-    void init() {
-        logger.info("repositoryPath:{}", repositoryPath);
+//    @Pointcut(value =  AspectPointJoinConig.POINT_CUT_METHOD)
+//    public void dealAfterReturning() {
+//
+//    }
+
+//    @AfterReturning(pointcut = "dealAfterReturning()", returning = "returnVlu")
+//    public void afterReturn(JoinPoint joinPoint, Object returnVlu) {
+//
+//        this.dealParamAndReturn(joinPoint, returnVlu);
+//
+//    }
+
+    @Pointcut(value = "@annotation(mockTestMark)")
+    public void dealAfterReturningForAnnotation(MockTestMark mockTestMark) {
+
     }
 
-    @Value("${generate.repository.path}")
-    private String repositoryPath;
+//    @AfterReturning(pointcut = "@annotation(mockTestMark)", returning = "returnVlu")
+//    public void afterReturnForAnnotion(JoinPoint joinPoint, Object returnVlu, MockTestMark mockTestMark) {
+//
+//        this.dealParamAndReturn(joinPoint, returnVlu);
+//
+//    }
 
-    Logger logger = LoggerFactory.getLogger(Repositoryaspect.class);
+    @AfterReturning(pointcut = "dealAfterReturningForAnnotation(mockTestMark)", returning = "returnVlu")
+    public void afterReturnForAnnotion(JoinPoint joinPoint, Object returnVlu, MockTestMark mockTestMark) {
+
+        if(!generateUnitTestForMockConfig.isPower_switch()){
+            return;
+        }
 
 
-    @Pointcut(value = AspectPointJoinConig.POINT_CUT_METHOD)
-    public void dealAfterReturning() {
+        this.dealParamAndReturn(joinPoint, returnVlu);
 
     }
 
-    @AfterReturning(pointcut = "dealAfterReturning()", returning = "returnVlu")
-    public void afterReturn(JoinPoint joinPoint, Object returnVlu) {
-//        logger.info("AfterReturning:进入");
+
+    /**
+     *  处理参数和返回信息
+     * @param joinPoint
+     * @param returnVlu
+     */
+    private void dealParamAndReturn(JoinPoint joinPoint, Object returnVlu) {
+        String className = joinPoint.getTarget().getClass().getName();
+        if(!className.equals("repositoryPath")){
+            logger.info("切面生效：");
+            logger.info(className);
+        }
 
         // init
         MethodDescript methodDescript = new MethodDescript();

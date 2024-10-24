@@ -1,6 +1,7 @@
 package xxyy.unittest.generateunittestformock.service.impl;
 
 import org.springframework.stereotype.Service;
+import xxyy.unittest.generateunittestformock.annotation.MockTestMark;
 import xxyy.unittest.generateunittestformock.dto.UserInfoDto;
 import xxyy.unittest.generateunittestformock.service.TestAspectService;
 
@@ -64,6 +65,7 @@ public class TestAspectServiceImpl implements TestAspectService {
         return map;
     }
 
+    @MockTestMark
     @Override
     public Object testObject() {
 

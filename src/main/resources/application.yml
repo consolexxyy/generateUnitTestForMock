@@ -3,9 +3,8 @@ spring:
         name: generateUnitTestForMock
 server:
   port: 80
-generate:
-  repository:
-    path: execution(public * xxyy.unittest.generateunittestformock.service..*.*(..)))
-  service:
-    path: servicePath
-  filepath: C:\Users\xxyyg\Desktop\unitTest.txt
+unittestgenerate:
+  power_switch: false
+  aop_path:
+  type: annotation
+  filepath:
